@@ -22,7 +22,7 @@ class ToDoCubit extends Cubit<ToDoState> {
         emit(const ToDosEmpty());
       }
     } on NetworkException {
-      emit(const ToDosError("Couldn't fetch weather. Is the device online?"));
+      emit(const ToDosError("Couldn't fetch data. Is the device online?"));
     }
   }
 }
