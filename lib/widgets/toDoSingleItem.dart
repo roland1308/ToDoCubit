@@ -44,6 +44,7 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
       duration: const Duration(seconds: 1),
       curve: Curves.fastOutSlowIn,
       child: ListTile(
+        key: Key("ToDoWidget"),
         onTap: () {
           final toDoCubit = context.read<ToDoCubit>();
           toDoCubit.editToDo(widget.toDo);
@@ -65,6 +66,7 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
 
   Widget buildEditToDo() {
     return ListTile(
+      key: Key("editTile"),
       leading: const CircleAvatar(
         backgroundColor: Colors.red,
         child: Icon(Icons.edit),

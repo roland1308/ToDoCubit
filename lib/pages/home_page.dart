@@ -40,7 +40,8 @@ class HomePage extends StatelessWidget {
               ),
               floatingActionButton: toDoState is ToDosLoaded
                   ? FloatingActionButton(
-                      onPressed: () => addNewComment(context),
+                  key: Key("addButton"),
+                  onPressed: () => addNewComment(context),
                       tooltip: 'Add Item',
                       child: const Icon(Icons.add))
                   : Container(),
@@ -75,7 +76,7 @@ class HomePage extends StatelessWidget {
 
   Future<void> addNewComment(BuildContext context) async {
     final TextEditingController textEditingController =
-    TextEditingController(text: "");
+        TextEditingController(text: "");
     return showDialog<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -111,6 +112,7 @@ class HomePage extends StatelessWidget {
 
   Widget buildLoading() {
     return const Center(
+      key: Key("loader"),
       child: CircularProgressIndicator(),
     );
   }
