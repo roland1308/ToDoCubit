@@ -23,13 +23,13 @@ class MyApp extends StatelessWidget {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'To Do YourStep',
+        title: 'To Do - With Cubit',
         theme: state is ThemeDark
             ? ThemeData(
           buttonTheme: const ButtonThemeData(
-            buttonColor: Colors.deepPurple, //  <-- dark color
+            buttonColor: Colors.deepPurple,
             textTheme: ButtonTextTheme
-                .primary, //  <-- this auto selects the right color
+                .primary,
           ),
           colorScheme: const ColorScheme.dark().copyWith(
             secondary: Colors.purpleAccent,

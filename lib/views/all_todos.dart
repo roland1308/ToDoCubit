@@ -8,12 +8,10 @@ class AllToDos extends StatelessWidget {
     super.key,
     required this.scrollController,
     required this.toDos,
-    required this.context,
   });
 
   final ScrollController scrollController;
   final List<ToDo> toDos;
-  final BuildContext context;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +22,6 @@ class AllToDos extends StatelessWidget {
           return Card(
             child: TodoSingleItem(
               toDo: toDo,
-              onTodoEdited: () {
-              },
             ),
           );
         }).toList());

@@ -6,11 +6,9 @@ import '../models/todo_model.dart';
 class TodoSingleItem extends StatefulWidget {
   TodoSingleItem({
     required this.toDo,
-    required this.onTodoEdited,
   }) : super(key: ObjectKey(toDo));
 
   final ToDo toDo;
-  final Function() onTodoEdited;
 
   @override
   State<TodoSingleItem> createState() => _TodoSingleItemState();
@@ -27,7 +25,7 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
     _textEditingController.text = widget.toDo.comment;
     return BlocBuilder<ToDoCubit, ToDoState>(builder: (_, state) {
       if (state is ToDosEditing && state.editedId == widget.toDo.toDoId) {
-        return buildEditToDo(context);
+        return buildEditToDo();
       } else {
         return buildNormalToDo(context);
       }
@@ -36,19 +34,26 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
 
   Widget buildNormalToDo(BuildContext context) {
     return AnimatedOpacity(
+      onEnd: () {
+        if (mounted) {
+          final toDoCubit = context.read<ToDoCubit>();
+          toDoCubit.removeTodo(widget.toDo);
+        }
+      },
       opacity: _opacity,
       duration: const Duration(seconds: 1),
       curve: Curves.fastOutSlowIn,
       child: ListTile(
         onTap: () {
-          widget.onTodoEdited();
+          final toDoCubit = context.read<ToDoCubit>();
+          toDoCubit.editToDo(widget.toDo);
         },
         leading: CircleAvatar(
           child: Text(widget.toDo.comment[0].toUpperCase()),
         ),
         title: Text(widget.toDo.comment),
         trailing: IconButton(
-          onPressed: () => removeSingleItem(context, widget.toDo),
+          onPressed: () => removeSingleItem(),
           icon: const Icon(
             Icons.remove_circle,
             color: Colors.red,
@@ -58,7 +63,7 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
     );
   }
 
-  Widget buildEditToDo(BuildContext context) {
+  Widget buildEditToDo() {
     return ListTile(
       leading: const CircleAvatar(
         backgroundColor: Colors.red,
@@ -71,6 +76,13 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
       ),
       trailing: IconButton(
         onPressed: () {
+          if (_textEditingController.text != "") {
+            final todoCubit = context.read<ToDoCubit>();
+            todoCubit.updateTodo(
+              widget.toDo.toDoId,
+              _textEditingController.text,
+            );
+          }
         },
         icon: const Icon(
           Icons.send_and_archive,
@@ -80,7 +92,7 @@ class _TodoSingleItemState extends State<TodoSingleItem> {
     );
   }
 
-  Future<void> removeSingleItem(BuildContext context, ToDo toDo) async {
+  Future<void> removeSingleItem() async {
     setState(() {
       _opacity = 0;
     });

@@ -52,20 +52,16 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Future<void> addNewComment(BuildContext context) async {}
-
   Widget correctView(ToDoState state, BuildContext context) {
     if (state is ToDosLoaded) {
       return AllToDos(
         toDos: state.toDos,
         scrollController: _scrollController,
-        context: context,
       );
     } else if (state is ToDosEditing) {
       return AllToDos(
         toDos: state.toDos,
         scrollController: _scrollController,
-        context: context,
       );
     } else if (state is ToDosLoading) {
       return buildLoading();
@@ -75,6 +71,42 @@ class HomePage extends StatelessWidget {
       // (state is ToDosError)
       return buildEmptyList(context);
     }
+  }
+
+  Future<void> addNewComment(BuildContext context) async {
+    final TextEditingController textEditingController =
+    TextEditingController(text: "");
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Add a new todo item'),
+          content: TextField(
+            autofocus: true,
+            controller: textEditingController,
+            decoration: const InputDecoration(hintText: 'Type your new todo'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Add'),
+              onPressed: () {
+                if (textEditingController.text != "") {
+                  final todoCubit = context.read<ToDoCubit>();
+                  todoCubit.addTodo(textEditingController.text);
+                  if (_scrollController.hasClients) {
+                    _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut);
+                  }
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget buildLoading() {

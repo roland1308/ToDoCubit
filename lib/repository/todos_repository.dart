@@ -15,14 +15,13 @@ class FakeToDosRepository implements ToDosRepository {
     return Future.delayed(
       const Duration(seconds: 5),
       () {
-        final random = Random();
+        /// Simulate some network exception
+        // final random = Random();
+        // if (random.nextBool()) {
+        //   throw NetworkException();
+        // }
 
-        //Simulate some network exception
-        if (random.nextBool()) {
-          throw NetworkException();
-        }
-
-        // Return "fetched" ToDos
+        /// Return "fetched" ToDos
         return <ToDo>[ToDo(toDoId: 1, comment: "comment")];
       },
     );
