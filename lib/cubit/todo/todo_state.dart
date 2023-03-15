@@ -27,10 +27,10 @@ class ToDosLoaded extends ToDoState {
   List<Object?> get props => [toDos];
 }
 
-class ToDosError extends ToDoState {
+class ToDosDBError extends ToDoState {
   final String message;
 
-  const ToDosError(this.message);
+  const ToDosDBError(this.message);
 
   @override
   // TODO: implement props

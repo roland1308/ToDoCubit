@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:to_to_cubit/repository/todos_repository.dart';
 
 import '../cubit/theme/theme_cubit.dart';
 import '../cubit/todo/todo_cubit.dart';
@@ -15,7 +16,7 @@ class HomePage extends StatelessWidget {
     return SafeArea(
       child: BlocConsumer<ToDoCubit, ToDoState>(
         listener: (context, state) {
-          if (state is ToDosError) {
+          if (state is ToDosDBError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -40,8 +41,8 @@ class HomePage extends StatelessWidget {
               ),
               floatingActionButton: toDoState is ToDosLoaded
                   ? FloatingActionButton(
-                  key: Key("addButton"),
-                  onPressed: () => addNewComment(context),
+                      key: const Key("addButton"),
+                      onPressed: () => addNewComment(context),
                       tooltip: 'Add Item',
                       child: const Icon(Icons.add))
                   : Container(),
@@ -69,8 +70,8 @@ class HomePage extends StatelessWidget {
     } else if (state is ToDosEmpty) {
       return buildEmptyList(context);
     } else {
-      // (state is ToDosError)
-      return buildEmptyList(context);
+      // (state is ToDosDBError)
+      return buildError(context);
     }
   }
 
@@ -93,7 +94,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 if (textEditingController.text != "") {
                   final todoCubit = context.read<ToDoCubit>();
-                  todoCubit.addTodo(textEditingController.text);
+                  todoCubit.addToDo(textEditingController.text);
                   if (_scrollController.hasClients) {
                     _scrollController.animateTo(
                         _scrollController.position.maxScrollExtent,
@@ -132,6 +133,18 @@ class HomePage extends StatelessWidget {
               child: const Text("Add now"))
         ],
       ),
+    );
+  }
+
+  Widget buildError(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: ElevatedButton(
+          onPressed: () {
+            final todoCubit = context.read<ToDoCubit>();
+            todoCubit.getToDos();
+          },
+          child: const Text("Reload")),
     );
   }
 }

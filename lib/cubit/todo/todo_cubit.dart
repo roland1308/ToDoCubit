@@ -21,34 +21,37 @@ class ToDoCubit extends Cubit<ToDoState> {
         emit(const ToDosEmpty());
       }
     } on NetworkException {
-      emit(const ToDosError("Couldn't fetch data. Is the device online?"));
+      emit(const ToDosDBError("Couldn't fetch data. Is the device online?"));
     }
   }
 
-  Future<void> addTodo(String comment) async {
+  Future<void> addToDo(String comment) async {
     if (state is ToDosEmpty) {
       emit(const ToDosLoaded([]));
     }
     final currentState = state;
     if (currentState is ToDosLoaded) {
-      final todo = <String, dynamic>{
+      final toDo = <String, dynamic>{
         "comment": comment,
         "toDoId": DateTime.now().millisecondsSinceEpoch,
       };
-      try {
+      bool addResult = await ToDosRepository().addTodo(toDo);
+      if (addResult) {
         final List<ToDo> stateToDos = List.from(currentState.toDos);
-        stateToDos.add(ToDo.fromJson(todo));
+        stateToDos.add(ToDo.fromJson(toDo));
         emit(ToDosLoaded(stateToDos));
-      } catch (e) {
-        emit(ToDosError(e.toString()));
+      } else {
+        emit(const ToDosDBError(
+            "An error occurred while adding To Do, please retry."));
       }
     }
   }
 
-  void removeTodo(ToDo toDo) {
+  Future<void> removeTodo(ToDo toDo) async {
     final currentState = state;
     if (currentState is ToDosLoaded) {
-      try {
+      bool removeResut = await ToDosRepository().removeTodo(toDo);
+      if (removeResut) {
         final List<ToDo> stateToDos = List.from(currentState.toDos);
         stateToDos.remove(toDo);
         if (stateToDos.isNotEmpty) {
@@ -56,11 +59,13 @@ class ToDoCubit extends Cubit<ToDoState> {
         } else {
           emit(const ToDosEmpty());
         }
-      } catch (e) {
-        emit(ToDosError(e.toString()));
+      } else {
+        emit(const ToDosDBError(
+            "An error occurred while removing To Do, please retry."));
       }
     }
   }
+
   void editToDo(ToDo toDo) {
     final currentState = state;
     if (currentState is ToDosLoaded) {
@@ -71,12 +76,18 @@ class ToDoCubit extends Cubit<ToDoState> {
   void updateTodo(int toDoId, String newComment) async {
     final currentState = state;
     if (currentState is ToDosEditing) {
-      currentState
-          .toDos[currentState.toDos
-          .indexWhere((element) => element.toDoId == toDoId)]
-          .comment = newComment;
-      emit(ToDosLoaded(currentState.toDos));
+      bool updateResult =
+          await ToDosRepository().updateTodo(toDoId, newComment);
+      if (updateResult) {
+        currentState
+            .toDos[currentState.toDos
+                .indexWhere((element) => element.toDoId == toDoId)]
+            .comment = newComment;
+        emit(ToDosLoaded(currentState.toDos));
+      } else {
+        emit(const ToDosDBError(
+            "An error occurred while updating To Do, please retry."));
+      }
     }
   }
-
 }

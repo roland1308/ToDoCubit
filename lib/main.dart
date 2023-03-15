@@ -1,15 +1,23 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:to_to_cubit/pages/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_to_cubit/repository/todos_repository.dart';
+import 'package:to_to_cubit/sharedpreferences/shared_preferences_manager.dart';
 
 import 'cubit/theme/theme_cubit.dart';
 import 'cubit/todo/todo_cubit.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  String themeMode = await SharedPreferencesManager().getThemeMode();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     BlocProvider(
-      create: (context) => ThemeCubit()..setInitialTheme("light"),
+      create: (context) => ThemeCubit()..setInitialTheme(themeMode),
       child: const MyApp(),
     ),
   );
@@ -39,7 +47,7 @@ class MyApp extends StatelessWidget {
         )
             : ThemeData(),
         home: BlocProvider(
-            create: (context) => ToDoCubit(FakeToDosRepository())..getToDos(),
+            create: (context) => ToDoCubit(ToDosRepository())..getToDos(),
             child: HomePage()),
       ),
     );
