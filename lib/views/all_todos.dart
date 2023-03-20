@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/todo_model.dart';
-import '../widgets/toDoSingleItem.dart';
+import '../widgets/to_do_single_item.dart';
 
 class AllToDos extends StatelessWidget {
   const AllToDos({
